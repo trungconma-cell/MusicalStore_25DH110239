@@ -1,0 +1,154 @@
+﻿@model List<_25DH110239_MusicalStore.Data.Product>
+@using _25DH110239_MusicalStore.Data
+@{
+    ViewBag.Title = "Quản lý hàng hóa";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var categories = ViewBag.Categories as List<Category>;
+}
+
+<style>
+    .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 8px;
+    }
+
+        .filter-form input, .filter-form select {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+    .btn-black {
+        background: #111;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 13px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    th, td {
+        padding: 11px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+
+    th {
+        background: #f8f8f8;
+        font-weight: 600;
+    }
+
+    .thumb {
+        width: 55px;
+        height: 55px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+
+    .btn-edit {
+        background: #eee;
+        color: #111;
+        padding: 5px 10px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+    .btn-del {
+        background: #fee;
+        color: #c00;
+        border: 1px solid #fcc;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+</style>
+
+<div class="card">
+    <div class="toolbar">
+        <h2>Quản Lý Hàng Hóa (@Model.Count sản phẩm)</h2>
+        <a href="@Url.Action("Them", "HangHoa")" class="btn-black">+ Thêm nhạc cụ mới</a>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div style="background:#fee; color:#c00; padding:10px; border-radius:4px; margin-bottom:15px; font-size:13px;">@TempData["Error"]</div>
+    }
+
+    <form method="get" action="@Url.Action("Index", "HangHoa")" class="filter-form" style="margin-bottom:18px;">
+        <input type="text" name="q" value="@ViewBag.Keyword" placeholder="Tìm tên nhạc cụ..." />
+        <select name="categoryId">
+            <option value="">-- Tất cả hãng --</option>
+            @if (categories != null)
+            {
+                foreach (var c in categories)
+                {
+                    <option value="@c.CategoryID" @(ViewBag.CategoryId == c.CategoryID ? "selected" : "")>@c.CategoryName</option>
+                }
+            }
+        </select>
+        <button type="submit" class="btn-black">Lọc</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ảnh</th>
+                <th>Tên nhạc cụ</th>
+                <th>Hãng</th>
+                <th>Giá bán</th>
+                <th>Giảm (%)</th>
+                <th>Tồn kho</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                string imgSrc = p.ProductImage != null && p.ProductImage.StartsWith("http") ? p.ProductImage : Url.Content("~/Content/image/" + p.ProductImage);
+                <tr>
+                    <td>#@p.ProductID</td>
+                    <td><img src="@imgSrc" class="thumb" /></td>
+                    <td><strong>@p.ProductName</strong></td>
+                    <td>@(p.Category != null ? p.Category.CategoryName : "")</td>
+                    <td style="font-weight:600;">@p.ProductPrice.ToString("N0")đ</td>
+                    <td>@p.DiscountPercent%</td>
+                    <td><strong>@p.ProductStock</strong></td>
+                    <td>
+                        <a href="@Url.Action("Sua", "HangHoa", new { id = p.ProductID })" class="btn-edit">Sửa</a>
+                        <form method="post" action="@Url.Action("Xoa", "HangHoa", new { id = p.ProductID })" style="display:inline;" onsubmit="return confirm('Xóa sản phẩm này?');">
+                            <button type="submit" class="btn-del">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

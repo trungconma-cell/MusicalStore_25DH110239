@@ -1,0 +1,145 @@
+﻿@{
+    ViewBag.Title = "Giỏ hàng của bạn";
+}
+
+<style>
+    .cart-title {
+        font-size: 24px;
+        margin: 20px 0;
+    }
+
+    .cart-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 25px;
+    }
+
+        .cart-table th, .cart-table td {
+            padding: 14px;
+            border-bottom: 1px solid #eaeaea;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .cart-table th {
+            background: #f8f8f8;
+            font-weight: 600;
+        }
+
+    .cart-item-info {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+        .cart-item-info img {
+            width: 65px;
+            height: 65px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+    .qty-btn {
+        padding: 4px 10px;
+        border: 1px solid #ccc;
+        background: #fff;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .btn-del {
+        background: #fee;
+        color: #c00;
+        border: 1px solid #fcc;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .checkout-box {
+        max-width: 380px;
+        margin-left: auto;
+        border: 1px solid #eaeaea;
+        padding: 20px;
+        border-radius: 6px;
+        background: #fafafa;
+    }
+
+    .btn-checkout {
+        display: block;
+        width: 100%;
+        background: #111;
+        color: #fff;
+        text-align: center;
+        padding: 12px;
+        font-weight: 600;
+        border-radius: 4px;
+        margin-top: 15px;
+    }
+</style>
+
+<h2 class="cart-title">Giỏ Hàng Của Bạn</h2>
+
+<div id="cart-container"></div>
+
+<script>
+    // Hiển thị toàn bộ danh sách sản phẩm trong localStorage ra bảng
+    function renderCart() {
+        var cart = JSON.parse(localStorage.getItem('musical_cart')) || [];
+        var container = document.getElementById('cart-container');
+
+        if (cart.length === 0) {
+            container.innerHTML = '<p style="padding:30px 0; color:#666;">Giỏ hàng của bạn đang trống. <a href="@Url.Action("Index", "Home")" style="text-decoration:underline; font-weight:600; color:#111;">Tiếp tục mua sắm</a></p>';
+            return;
+        }
+
+        var total = 0;
+        var html = '<table class="cart-table"><thead><tr><th>SẢN PHẨM</th><th>ĐƠN GIÁ</th><th>SỐ LƯỢNG</th><th>TỔNG CỘNG</th><th>XÓA</th></tr></thead><tbody>';
+
+        cart.forEach(function (item, index) {
+            var lineTotal = item.price * item.quantity;
+            total += lineTotal;
+            html += '<tr>' +
+                '<td><div class="cart-item-info"><img src="' + item.image + '" /><span>' + item.name + '</span></div></td>' +
+                '<td>' + item.price.toLocaleString('vi-VN') + 'đ</td>' +
+                '<td>' +
+                '<button class="qty-btn" onclick="changeQty(' + index + ', -1)">-</button> ' +
+                '<span style="margin:0 8px;">' + item.quantity + '</span> ' +
+                '<button class="qty-btn" onclick="changeQty(' + index + ', 1)">+</button>' +
+                '</td>' +
+                '<td style="font-weight:600;">' + lineTotal.toLocaleString('vi-VN') + 'đ</td>' +
+                '<td><button class="btn-del" onclick="removeItem(' + index + ')">Xóa</button></td>' +
+                '</tr>';
+        });
+
+        html += '</tbody></table>';
+        html += '<div class="checkout-box">' +
+            '<div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700;">' +
+            '<span>Thành tiền:</span><span style="color:#d00;">' + total.toLocaleString('vi-VN') + 'đ</span></div>' +
+            '<p style="font-size:12px; color:#666; margin-top:8px;">Miễn phí vận chuyển cho đơn từ 1.000.000đ, dưới mức đó phí 30.000đ.</p>' +
+            '<a href="@Url.Action("DatHang", "Home")" class="btn-checkout">Thanh toán</a>' +
+            '</div>';
+
+        container.innerHTML = html;
+    }
+
+    function changeQty(index, delta) {
+        var cart = JSON.parse(localStorage.getItem('musical_cart')) || [];
+        cart[index].quantity += delta;
+        if (cart[index].quantity <= 0) cart.splice(index, 1);
+        localStorage.setItem('musical_cart', JSON.stringify(cart));
+        updateCartCount();
+        renderCart();
+    }
+
+    function removeItem(index) {
+        var cart = JSON.parse(localStorage.getItem('musical_cart')) || [];
+        cart.splice(index, 1);
+        localStorage.setItem('musical_cart', JSON.stringify(cart));
+        updateCartCount();
+        renderCart();
+    }
+
+    renderCart();
+</script>

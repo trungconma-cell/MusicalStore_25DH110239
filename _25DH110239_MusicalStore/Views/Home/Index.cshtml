@@ -1,0 +1,209 @@
+﻿@using _25DH110239_MusicalStore.Data
+@{
+    ViewBag.Title = "Trang chủ";
+    var hangMoiVe = ViewBag.HangMoiVe as List<Product>;
+    var sanPhamKhac = ViewBag.SanPhamKhac as List<Product>;
+}
+
+<style>
+    /* Banner lớn đầu trang với ảnh nền nhạc cụ chuyên nghiệp */
+    .hero-banner {
+        background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1400&q=80') center no-repeat;
+        background-size: cover;
+        color: #fff;
+        padding: 70px 45px;
+        border-radius: 8px;
+        margin-bottom: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        min-height: 320px;
+    }
+
+        .hero-banner h1 {
+            font-size: 38px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .hero-banner p {
+            color: #e0e0e0;
+            margin-bottom: 24px;
+            font-size: 16px;
+            max-width: 560px;
+            line-height: 1.5;
+        }
+
+    .btn-white {
+        background: #fff;
+        color: #111;
+        padding: 12px 26px;
+        font-weight: 600;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: 0.2s;
+    }
+
+        .btn-white:hover {
+            background: #e5e5e5;
+        }
+
+    /* Tiêu đề từng khu vực */
+    .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 35px 0 20px;
+        border-bottom: 2px solid #111;
+        padding-bottom: 8px;
+        display: inline-block;
+    }
+
+    /* Lưới thẻ sản phẩm 4 cột */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .product-card {
+        border: 1px solid #eaeaea;
+        border-radius: 6px;
+        padding: 14px;
+        transition: 0.2s;
+        position: relative;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .product-card:hover {
+            border-color: #111;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            background: #f9f9f9;
+        }
+
+    .product-name {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        height: 40px;
+        overflow: hidden;
+        line-height: 1.4;
+    }
+
+    .price-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: auto;
+    }
+
+    .sale-price {
+        color: #d00;
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    .old-price {
+        color: #888;
+        text-decoration: line-through;
+        font-size: 13px;
+    }
+
+    .badge-sale {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: #d00;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 8px;
+        border-radius: 3px;
+    }
+</style>
+
+<!-- Khối Banner đầu trang -->
+<div class="hero-banner">
+    <h1>Chọn nhạc cụ của bạn</h1>
+    <p>Khám phá bộ sưu tập Guitar, Piano, Organ và Trống điện tử chính hãng từ Yamaha, Fender, Roland, Casio và Gibson.</p>
+    <a href="@Url.Action("DanhMuc", "Home", new { id = 1 })" class="btn-white">Khám phá ngay</a>
+</div>
+
+<!-- Khu vực 1: Hàng mới về -->
+<div>
+    <h2 class="section-title">HÀNG MỚI VỀ</h2>
+    <div class="product-grid">
+        @if (hangMoiVe != null)
+        {
+            foreach (var item in hangMoiVe)
+            {
+                // Tính giá bán thực tế sau khi trừ phần trăm khuyến mãi
+                decimal finalPrice = item.ProductPrice * (100 - item.DiscountPercent) / 100;
+                // Kiểm tra nếu ProductImage là link http thì dùng trực tiếp, ngược lại lấy trong thư mục Content/image
+                string imgSrc = item.ProductImage != null && item.ProductImage.StartsWith("http")
+                    ? item.ProductImage
+                    : Url.Content("~/Content/image/" + item.ProductImage);
+
+                <a href="@Url.Action("ChiTietSanPham", "Home", new { id = item.ProductID })" class="product-card">
+                    @if (item.DiscountPercent > 0)
+                    {
+                        <span class="badge-sale">-@item.DiscountPercent%</span>
+                    }
+                    <img src="@imgSrc" alt="@item.ProductName" />
+                    <div class="product-name">@item.ProductName</div>
+                    <div class="price-box">
+                        <span class="sale-price">@finalPrice.ToString("N0")đ</span>
+                        @if (item.DiscountPercent > 0)
+                        {
+                            <span class="old-price">@item.ProductPrice.ToString("N0")đ</span>
+                        }
+                    </div>
+                </a>
+            }
+        }
+    </div>
+</div>
+
+<!-- Khu vực 2: Sản phẩm nổi bật -->
+<div>
+    <h2 class="section-title">SẢN PHẨM NỔI BẬT</h2>
+    <div class="product-grid">
+        @if (sanPhamKhac != null)
+        {
+            foreach (var item in sanPhamKhac)
+            {
+                decimal finalPrice = item.ProductPrice * (100 - item.DiscountPercent) / 100;
+                string imgSrc = item.ProductImage != null && item.ProductImage.StartsWith("http")
+                    ? item.ProductImage
+                    : Url.Content("~/Content/image/" + item.ProductImage);
+
+                <a href="@Url.Action("ChiTietSanPham", "Home", new { id = item.ProductID })" class="product-card">
+                    @if (item.DiscountPercent > 0)
+                    {
+                        <span class="badge-sale">-@item.DiscountPercent%</span>
+                    }
+                    <img src="@imgSrc" alt="@item.ProductName" />
+                    <div class="product-name">@item.ProductName</div>
+                    <div class="price-box">
+                        <span class="sale-price">@finalPrice.ToString("N0")đ</span>
+                        @if (item.DiscountPercent > 0)
+                        {
+                            <span class="old-price">@item.ProductPrice.ToString("N0")đ</span>
+                        }
+                    </div>
+                </a>
+            }
+        }
+    </div>
+</div>

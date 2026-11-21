@@ -1,0 +1,206 @@
+﻿@model _25DH110239_MusicalStore.Data.Product
+@using _25DH110239_MusicalStore.Data
+@{
+    ViewBag.Title = Model.ProductName;
+    decimal finalPrice = Model.ProductPrice * (100 - Model.DiscountPercent) / 100;
+    string imgSrc = Model.ProductImage != null && Model.ProductImage.StartsWith("http") ? Model.ProductImage : Url.Content("~/Content/image/" + Model.ProductImage);
+    var cungHang = ViewBag.SanPhamCungHang as List<Product>;
+}
+
+<style>
+    .detail-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        border: 1px solid #eaeaea;
+        padding: 30px;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .detail-img img {
+        width: 100%;
+        height: 380px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+
+    .detail-info h1 {
+        font-size: 26px;
+        margin-bottom: 12px;
+    }
+
+    .detail-price {
+        font-size: 24px;
+        color: #d00;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .old-price {
+        font-size: 16px;
+        color: #888;
+        text-decoration: line-through;
+        margin-left: 10px;
+        font-weight: 400;
+    }
+
+    .stock-badge {
+        display: inline-block;
+        background: #eef9f0;
+        color: #1a7f37;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .desc {
+        color: #444;
+        line-height: 1.6;
+        font-size: 14px;
+        margin-bottom: 24px;
+    }
+
+    .qty-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+        .qty-box input {
+            width: 70px;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 15px;
+        }
+
+    .btn-add-cart {
+        background: #111;
+        color: #fff;
+        border: none;
+        padding: 14px 32px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        .btn-add-cart:hover {
+            background: #333;
+        }
+
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-top: 15px;
+    }
+
+    .related-card {
+        border: 1px solid #eaeaea;
+        border-radius: 6px;
+        padding: 12px;
+    }
+
+        .related-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+</style>
+
+<div class="detail-box">
+    <div class="detail-img">
+        <img src="@imgSrc" alt="@Model.ProductName" />
+    </div>
+    <div class="detail-info">
+        <h1>@Model.ProductName</h1>
+        <div class="detail-price">
+            @finalPrice.ToString("N0")đ
+            @if (Model.DiscountPercent > 0)
+            {
+                <span class="old-price">@Model.ProductPrice.ToString("N0")đ</span>
+            }
+        </div>
+
+        @if (Model.ProductStock > 0)
+        {
+            <div class="stock-badge">Còn @Model.ProductStock sản phẩm trong kho</div>
+            <p class="desc">@Model.ProductDescription</p>
+
+            <div class="qty-box">
+                <label style="font-weight:600; font-size:14px;">Số lượng:</label>
+                <input type="number" id="buy-qty" value="1" min="1" max="@Model.ProductStock" />
+            </div>
+
+            <!-- Nút gọi hàm JavaScript lưu sản phẩm vào giỏ hàng localStorage -->
+            <button type="button" class="btn-add-cart" onclick="addToCart()">Thêm vào giỏ hàng</button>
+        }
+        else
+        {
+            <div class="stock-badge" style="background:#fee; color:#c00;">Tạm hết hàng</div>
+            <p class="desc">@Model.ProductDescription</p>
+        }
+    </div>
+</div>
+
+<!-- Gợi ý sản phẩm cùng thương hiệu -->
+@if (cungHang != null && cungHang.Count > 0)
+{
+    <h3 style="margin-top: 45px; font-size: 18px;">SẢN PHẨM CÙNG THƯƠNG HIỆU</h3>
+    <div class="related-grid">
+        @foreach (var item in cungHang)
+        {
+            decimal pPrice = item.ProductPrice * (100 - item.DiscountPercent) / 100;
+            string pImg = item.ProductImage != null && item.ProductImage.StartsWith("http") ? item.ProductImage : Url.Content("~/Content/image/" + item.ProductImage);
+            <a href="@Url.Action("ChiTietSanPham", "Home", new { id = item.ProductID })" class="related-card">
+                <img src="@pImg" alt="@item.ProductName" />
+                <div style="font-size:14px; font-weight:600; margin-bottom:4px;">@item.ProductName</div>
+                <div style="color:#d00; font-weight:700; font-size:14px;">@pPrice.ToString("N0")đ</div>
+            </a>
+        }
+    </div>
+}
+
+<script>
+    // Hàm thêm sản phẩm hiện tại vào giỏ hàng lưu trong localStorage
+    function addToCart() {
+        var qty = parseInt(document.getElementById('buy-qty').value);
+        var maxStock = @Model.ProductStock;
+        if (qty < 1 || qty > maxStock) {
+            alert('Số lượng phải từ 1 đến ' + maxStock);
+            return;
+        }
+
+        var cart = JSON.parse(localStorage.getItem('musical_cart')) || [];
+        var productId = @Model.ProductID;
+        var existing = cart.find(function (x) { return x.id === productId; });
+
+        if (existing) {
+            if (existing.quantity + qty > maxStock) {
+                alert('Tổng số lượng trong giỏ vượt quá tồn kho!');
+                return;
+            }
+            existing.quantity += qty;
+        } else {
+            cart.push({
+                id: productId,
+                name: '@Html.Raw(Model.ProductName.Replace("'", "\\'"))',
+                price: @finalPrice,
+                quantity: qty,
+                image: '@imgSrc'
+            });
+        }
+
+        localStorage.setItem('musical_cart', JSON.stringify(cart));
+        updateCartCount();
+        alert('Đã thêm nhạc cụ vào giỏ hàng!');
+    }
+</script>

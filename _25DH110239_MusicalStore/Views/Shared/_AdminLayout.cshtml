@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - ADMIN MUSICAL STORE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background: #f5f5f5;
+            color: #111;
+        }
+        /* Thanh menu dọc bên trái nền trắng - đen giống bài mẫu */
+        aside {
+            width: 240px;
+            background: #fff;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-brand {
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            border-bottom: 1px solid #eee;
+            letter-spacing: 1px;
+        }
+
+        .admin-menu {
+            list-style: none;
+            padding: 15px 10px;
+            flex: 1;
+        }
+
+            .admin-menu li {
+                margin-bottom: 6px;
+            }
+
+            .admin-menu a {
+                display: block;
+                padding: 11px 15px;
+                border-radius: 6px;
+                text-decoration: none;
+                color: #333;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+                .admin-menu a:hover, .admin-menu a.active {
+                    background: #111;
+                    color: #fff;
+                }
+
+        .main-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 25px;
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <aside>
+        <div class="admin-brand">MUSICAL ADMIN</div>
+        <ul class="admin-menu">
+            <li><a href="@Url.Action("Index", "DonHang")">Quản lý đơn hàng</a></li>
+            <li><a href="@Url.Action("Index", "HangHoa")">Quản lý hàng hóa</a></li>
+            <li><a href="@Url.Action("Index", "DanhMuc")">Quản lý danh mục</a></li>
+            <li><a href="@Url.Action("Index", "Voucher")">Quản lý voucher</a></li>
+            <li><a href="@Url.Action("Index", "ThongKe")">Thống kê doanh thu</a></li>
+        </ul>
+    </aside>
+    <div class="main-wrap">
+        <header>
+            <strong>Hệ thống quản trị cửa hàng nhạc cụ (Nhóm 0202-G17)</strong>
+            <div>
+                <a href="@Url.Action("Index", "Home")" style="margin-right:15px; text-decoration:underline; color:#111;">Xem cửa hàng</a>
+                <a href="@Url.Action("DangXuat", "Home")" style="color:#d00; font-weight:600;">Đăng xuất</a>
+            </div>
+        </header>
+        <div class="content">
+            @RenderBody()
+        </div>
+    </div>
+</body>
+</html>

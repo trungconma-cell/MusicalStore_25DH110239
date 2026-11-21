@@ -1,0 +1,273 @@
+﻿@model _25DH110239_MusicalStore.Data.Customer
+@{
+    ViewBag.Title = "Thông tin nhận hàng & Thanh toán";
+}
+
+<style>
+    .checkout-container {
+        max-width: 600px;
+        margin: 30px auto;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 30px;
+        background: #fff;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+        .checkout-container h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 12px;
+        }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 18px;
+        font-weight: 700;
+        border-top: 1px solid #eee;
+        padding-top: 12px;
+        margin-top: 12px;
+        margin-bottom: 20px;
+    }
+
+    .voucher-box {
+        display: flex;
+        gap: 8px;
+        margin: 15px 0;
+    }
+
+        .voucher-box input {
+            flex: 1;
+            padding: 9px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+    .btn-apply {
+        background: #d00;
+        color: #fff;
+        border: none;
+        padding: 0 18px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+    .pay-option {
+        border: 1px solid #ddd;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        background: #111;
+        color: #fff;
+        border: none;
+        padding: 14px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+
+        .btn-submit:hover {
+            background: #333;
+        }
+</style>
+
+<div class="checkout-container">
+    <h2>Thông Tin Nhận Hàng</h2>
+
+    <!-- Khu vực hiển thị tóm tắt tiền hàng, giảm giá, phí ship -->
+    <div class="summary-row">
+        <span>Tiền hàng:</span>
+        <span id="txt-subtotal" style="font-weight:600;">0đ</span>
+    </div>
+    <div class="summary-row">
+        <span>Giảm giá voucher:</span>
+        <span id="txt-discount" style="color:#1a7f37; font-weight:600;">-0đ</span>
+    </div>
+    <div class="summary-row">
+        <span>Phí vận chuyển (miễn phí từ 1.000.000đ):</span>
+        <span id="txt-ship" style="font-weight:600;">0đ</span>
+    </div>
+
+    <!-- Ô nhập mã giảm giá (Gợi ý: MUSIC10 hoặc WELCOME20) -->
+    <div class="voucher-box">
+        <input type="text" id="voucher-code" placeholder="Nhập mã giảm giá (vd: MUSIC10)" />
+        <button type="button" class="btn-apply" onclick="applyVoucher()">Áp dụng</button>
+    </div>
+    <div id="voucher-msg" style="font-size:12px; margin-bottom:10px;"></div>
+
+    <div class="summary-total">
+        <span>Thành tiền cần thanh toán:</span>
+        <span id="txt-total" style="color:#d00;">0đ</span>
+    </div>
+
+    <!-- Form thông tin người nhận (tự động điền từ thông tin tài khoản Customer) -->
+    <div class="form-group">
+        <label>Họ và tên người nhận *</label>
+        <input type="text" id="recv-name" value="@(Model != null ? Model.CustomerName : "")" required />
+    </div>
+    <div class="form-group">
+        <label>Số điện thoại người nhận *</label>
+        <input type="text" id="recv-phone" value="@(Model != null ? Model.CustomerPhone : "")" required />
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="recv-email" value="@(Model != null ? Model.CustomerEmail : "")" />
+    </div>
+    <div class="form-group">
+        <label>Địa chỉ giao hàng *</label>
+        <input type="text" id="recv-address" value="@(Model != null ? Model.CustomerAddress : "")" required />
+    </div>
+
+    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:8px;">Phương thức thanh toán *</label>
+    <label class="pay-option">
+        <input type="radio" name="payMethod" value="COD" checked />
+        <span style="display:block;">
+            <strong>Thanh toán khi nhận hàng (COD)</strong>
+            <span style="display:block; font-size:12px; color:#666;">Trả tiền mặt cho nhân viên giao hàng</span>
+        </span>
+    </label>
+    <label class="pay-option">
+        <input type="radio" name="payMethod" value="Chuyển khoản" />
+        <span style="display:block;">
+            <strong>Chuyển khoản ngân hàng trước</strong>
+            <span style="display:block; font-size:12px; color:#666;">Đơn được ghi nhận "Đã thanh toán"</span>
+        </span>
+    </label>
+
+    <button type="button" class="btn-submit" onclick="submitOrder()">Xác Nhận Đặt Hàng & Thanh Toán</button>
+</div>
+
+<script>
+    var cart = JSON.parse(localStorage.getItem('musical_cart')) || [];
+    var subTotal = cart.reduce(function (sum, item) { return sum + item.price * item.quantity; }, 0);
+    var discountAmount = 0;
+    var appliedCode = '';
+
+    // Cập nhật hiển thị tổng tiền và phí ship
+    function updateTotals() {
+        if (cart.length === 0) {
+            alert('Giỏ hàng trống!');
+            window.location.href = '@Url.Action("Index", "Home")';
+            return;
+        }
+        var afterDiscount = subTotal - discountAmount;
+        var shippingFee = afterDiscount >= 1000000 ? 0 : 30000;
+        var finalTotal = afterDiscount + shippingFee;
+
+        document.getElementById('txt-subtotal').innerText = subTotal.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('txt-discount').innerText = '-' + discountAmount.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('txt-ship').innerText = shippingFee.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('txt-total').innerText = finalTotal.toLocaleString('vi-VN') + 'đ';
+    }
+
+    // Gọi AJAX lên HomeController/KiemTraVoucher để kiểm tra mã giảm giá
+    function applyVoucher() {
+        var code = document.getElementById('voucher-code').value.trim().toUpperCase();
+        if (!code) return;
+
+        fetch('@Url.Action("KiemTraVoucher", "Home")', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: code, subTotal: subTotal })
+        })
+        .then(res => res.json())
+        .then(data => {
+            var msg = document.getElementById('voucher-msg');
+            if (data.success) {
+                discountAmount = data.discountAmount;
+                appliedCode = code;
+                msg.style.color = '#1a7f37';
+                msg.innerText = 'Áp dụng thành công mã ' + code + ' (Giảm ' + data.discountPercent + '%)';
+            } else {
+                discountAmount = 0;
+                appliedCode = '';
+                msg.style.color = '#c00';
+                msg.innerText = data.message;
+            }
+            updateTotals();
+        });
+    }
+
+    // Gửi toàn bộ thông tin đơn hàng và giỏ hàng về server lưu vào SQL Server
+    function submitOrder() {
+        var name = document.getElementById('recv-name').value.trim();
+        var phone = document.getElementById('recv-phone').value.trim();
+        var email = document.getElementById('recv-email').value.trim();
+        var address = document.getElementById('recv-address').value.trim();
+        var method = document.querySelector('input[name="payMethod"]:checked').value;
+
+        if (!name || !phone || !address) {
+            alert('Vui lòng nhập đầy đủ Họ tên, Số điện thoại và Địa chỉ giao hàng!');
+            return;
+        }
+
+        fetch('@Url.Action("TaoDonHang", "Home")', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                receiverName: name,
+                receiverPhone: phone,
+                receiverEmail: email,
+                addressDelivery: address,
+                paymentMethod: method,
+                voucherCode: appliedCode,
+                cartJson: JSON.stringify(cart)
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.removeItem('musical_cart');
+                updateCartCount();
+                window.location.href = '@Url.Action("Bill", "Home")?id=' + data.orderId;
+            } else {
+                alert(data.message);
+            }
+        });
+    }
+
+    updateTotals();
+</script>

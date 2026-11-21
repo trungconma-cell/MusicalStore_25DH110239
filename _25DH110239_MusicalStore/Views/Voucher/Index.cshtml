@@ -1,0 +1,109 @@
+﻿@model List<_25DH110239_MusicalStore.Data.Voucher>
+@{
+    ViewBag.Title = "Quản lý voucher";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 20px;
+    }
+
+    .v-form {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+
+        .v-form input {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+    .btn-black {
+        background: #111;
+        color: #fff;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+
+    th {
+        background: #f8f8f8;
+        font-weight: 600;
+    }
+
+    .btn-toggle {
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 12px;
+    }
+</style>
+
+<div class="card">
+    <h2 style="margin-bottom:15px;">Tạo Mã Giảm Giá Mới</h2>
+    <form method="post" action="@Url.Action("Them", "Voucher")" class="v-form">
+        <input type="text" name="code" required placeholder="Mã (vd: SALE15)" style="text-transform:uppercase;" />
+        <input type="number" name="discountPercent" required min="1" max="90" placeholder="% Giảm (1-90)" />
+        <input type="number" name="minOrder" required min="0" placeholder="Đơn tối thiểu (VNĐ)" />
+        <input type="date" name="expiryDate" required />
+        <button type="submit" class="btn-black">+ Tạo Voucher</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom:15px;">Danh Sách Mã Giảm Giá</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Mã Code</th>
+                <th>Giảm (%)</th>
+                <th>Đơn tối thiểu</th>
+                <th>Hạn sử dụng</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var v in Model)
+            {
+                <tr>
+                    <td><strong>@v.Code</strong></td>
+                    <td style="color:#d00; font-weight:700;">@v.DiscountPercent%</td>
+                    <td>@v.MinOrder.ToString("N0")đ</td>
+                    <td>@v.ExpiryDate.ToString("dd/MM/yyyy")</td>
+                    <td>@(v.IsActive ? "Đang hoạt động" : "Đã tắt")</td>
+                    <td>
+                        <form method="post" action="@Url.Action("BatTat", "Voucher", new { id = v.VoucherID })">
+                            <button type="submit" class="btn-toggle">@(v.IsActive ? "Tắt mã" : "Bật mã")</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

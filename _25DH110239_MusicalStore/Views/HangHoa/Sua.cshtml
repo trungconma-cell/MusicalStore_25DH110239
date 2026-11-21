@@ -1,0 +1,85 @@
+﻿@model _25DH110239_MusicalStore.Data.Product
+@{
+    ViewBag.Title = "Sửa nhạc cụ";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .form-card {
+        max-width: 650px;
+        background: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .fg {
+        margin-bottom: 14px;
+    }
+
+        .fg label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .fg input, .fg select, .fg textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+    .btn-black {
+        background: #111;
+        color: #fff;
+        border: none;
+        padding: 11px 22px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+</style>
+
+<div class="form-card">
+    <h2 style="margin-bottom:18px;">Cập Nhật Thông Tin Nhạc Cụ</h2>
+    <form method="post" action="@Url.Action("Sua", "HangHoa")" enctype="multipart/form-data">
+        <input type="hidden" name="ProductID" value="@Model.ProductID" />
+        <div class="fg">
+            <label>Thương hiệu (Hãng) *</label>
+            @Html.DropDownList("CategoryID", null, new { @class = "form-control" })
+        </div>
+        <div class="fg">
+            <label>Tên nhạc cụ *</label>
+            <input type="text" name="ProductName" value="@Model.ProductName" required />
+        </div>
+        <div class="fg">
+            <label>Giá bán (VNĐ) *</label>
+            <input type="number" name="ProductPrice" value="@Model.ProductPrice" required min="0" />
+        </div>
+        <div class="fg">
+            <label>Phần trăm giảm giá (0 - 90%)</label>
+            <input type="number" name="DiscountPercent" value="@Model.DiscountPercent" min="0" max="90" />
+        </div>
+        <div class="fg">
+            <label>Số lượng tồn kho *</label>
+            <input type="number" name="ProductStock" value="@Model.ProductStock" required min="0" />
+        </div>
+        <div class="fg">
+            <label>Đổi ảnh mới từ máy tính (bỏ trống nếu giữ ảnh cũ)</label>
+            <input type="file" name="imageFile" accept="image/*" />
+        </div>
+        <div class="fg">
+            <label>Hoặc sửa URL hình ảnh</label>
+            <input type="text" name="ProductImage" value="@Model.ProductImage" />
+        </div>
+        <div class="fg">
+            <label>Mô tả chi tiết</label>
+            <textarea name="ProductDescription" rows="4">@Model.ProductDescription</textarea>
+        </div>
+        <button type="submit" class="btn-black">Cập nhật</button>
+        <a href="@Url.Action("Index", "HangHoa")" style="margin-left:12px; font-size:14px;">Hủy</a>
+    </form>
+</div>

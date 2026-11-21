@@ -1,0 +1,124 @@
+﻿@{
+    ViewBag.Title = "Đăng ký tài khoản";
+}
+
+<style>
+    .auth-box {
+        max-width: 900px;
+        margin: 30px auto;
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .auth-img {
+        background: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80') center no-repeat;
+        background-size: cover;
+        min-height: 450px;
+    }
+
+    .auth-form {
+        padding: 35px 40px;
+    }
+
+        .auth-form h2 {
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+
+        .auth-form p {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+    .btn-black {
+        width: 100%;
+        background: #111;
+        color: #fff;
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    .alert-err {
+        background: #fee;
+        color: #c00;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="auth-box">
+    <div class="auth-img"></div>
+    <div class="auth-form">
+        <h2>Tạo tài khoản</h2>
+        <p>Tham gia cùng cộng đồng yêu nhạc cụ Musical Store</p>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert-err">@ViewBag.Error</div>
+        }
+
+        <!-- Form gửi thông tin đăng ký tài khoản mới -->
+        <form method="post" action="@Url.Action("DangKy", "Home")">
+            <div class="form-group">
+                <label>Tên đăng nhập *</label>
+                <input type="text" name="username" required minlength="5" placeholder="Tối thiểu 5 ký tự" />
+            </div>
+            <div class="form-group">
+                <label>Họ và tên *</label>
+                <input type="text" name="fullName" required placeholder="Nhập họ tên đầy đủ" />
+            </div>
+            <div class="form-group">
+                <label>Số điện thoại *</label>
+                <input type="text" name="phone" required pattern="[0-9]{10}" placeholder="Nhập đúng 10 chữ số" />
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="example@gmail.com" />
+            </div>
+            <div class="form-group">
+                <label>Địa chỉ nhận hàng *</label>
+                <input type="text" name="address" required minlength="10" placeholder="Số nhà, đường, quận/huyện, tỉnh/thành" />
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu *</label>
+                <input type="password" name="password" required minlength="6" placeholder="Nhập mật khẩu" />
+            </div>
+            <div class="form-group">
+                <label>Xác nhận mật khẩu *</label>
+                <input type="password" name="confirmPassword" required placeholder="Nhập lại mật khẩu" />
+            </div>
+            <button type="submit" class="btn-black">Đăng ký</button>
+        </form>
+    </div>
+</div>

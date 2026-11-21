@@ -1,0 +1,112 @@
+﻿@model List<_25DH110239_MusicalStore.Data.Order>
+@{
+    ViewBag.Title = "Đơn hàng của tôi";
+}
+
+<style>
+    .history-title {
+        font-size: 24px;
+        margin: 20px 0;
+    }
+
+    .order-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #eaeaea;
+    }
+
+        .order-table th, .order-table td {
+            padding: 14px;
+            border-bottom: 1px solid #eaeaea;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .order-table th {
+            background: #f8f8f8;
+            font-weight: 600;
+        }
+
+    .badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-wait {
+        background: #fff8c5;
+        color: #9a6700;
+    }
+
+    .badge-done {
+        background: #dafbe1;
+        color: #1a7f37;
+    }
+
+    .badge-cancel {
+        background: #ffebe9;
+        color: #cf222e;
+    }
+
+    .btn-cancel {
+        background: #cf222e;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+</style>
+
+<h2 class="history-title">ĐƠN HÀNG CỦA TÔI (@Session["FullName"])</h2>
+
+@if (Model.Count == 0)
+{
+    <p style="color:#666;">Bạn chưa có đơn hàng nào.</p>
+}
+else
+{
+    <table class="order-table">
+        <thead>
+            <tr>
+                <th>Mã đơn</th>
+                <th>Sản phẩm đã đặt</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Thanh toán</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                string badgeClass = order.OrderStatus == "Hoàn thành" ? "badge-done" : (order.OrderStatus == "Đã hủy" ? "badge-cancel" : "badge-wait");
+                <tr>
+                    <td><strong>#@order.OrderID</strong></td>
+                    <td>
+                        @foreach (var d in order.OrderDetails)
+                        {
+                            <div>• @d.ProductName <strong>x @d.Quantity</strong></div>
+                        }
+                    </td>
+                    <td>@(order.OrderDate.HasValue ? order.OrderDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                    <td style="font-weight:700; color:#d00;">@order.TotalAmount.ToString("N0")đ</td>
+                    <td><span class="badge @badgeClass">@order.OrderStatus</span></td>
+                    <td>@order.PaymentStatus</td>
+                    <td>
+                        <a href="@Url.Action("Bill", "Home", new { id = order.OrderID })" style="text-decoration:underline; margin-right:8px;">Hóa đơn</a>
+                        @if (order.OrderStatus == "Chờ xác nhận")
+                        {
+                            <form method="post" action="@Url.Action("HuyDonHang", "Home", new { id = order.OrderID })" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?');">
+                                <button type="submit" class="btn-cancel">Hủy đơn</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

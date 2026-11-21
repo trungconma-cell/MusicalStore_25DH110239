@@ -1,0 +1,166 @@
+﻿@model List<_25DH110239_MusicalStore.Data.Order>
+@{
+    ViewBag.Title = "Quản lý đơn hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .tab-btn {
+        padding: 7px 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #111;
+        font-size: 13px;
+        background: #fff;
+    }
+
+        .tab-btn.active {
+            background: #111;
+            color: #fff;
+            border-color: #111;
+        }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+
+    th {
+        background: #f8f8f8;
+        font-weight: 600;
+    }
+
+    .btn-next {
+        background: #111;
+        color: #fff;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .btn-cancel {
+        background: #cf222e;
+        color: #fff;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-left: 4px;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 600;
+        background: #eee;
+    }
+</style>
+
+<div class="card">
+    <h2 style="margin-bottom:15px;">Quản Lý Đơn Hàng</h2>
+
+    <div class="filter-tabs">
+        <a href="@Url.Action("Index", "DonHang")" class="tab-btn @(string.IsNullOrEmpty(ViewBag.TrangThai) ? "active" : "")">Tất cả</a>
+        <a href="@Url.Action("Index", "DonHang", new { trangThai = "Chờ xác nhận" })" class="tab-btn @(ViewBag.TrangThai == "Chờ xác nhận" ? "active" : "")">Chờ xác nhận</a>
+        <a href="@Url.Action("Index", "DonHang", new { trangThai = "Đã xác nhận" })" class="tab-btn @(ViewBag.TrangThai == "Đã xác nhận" ? "active" : "")">Đã xác nhận</a>
+        <a href="@Url.Action("Index", "DonHang", new { trangThai = "Đang giao" })" class="tab-btn @(ViewBag.TrangThai == "Đang giao" ? "active" : "")">Đang giao</a>
+        <a href="@Url.Action("Index", "DonHang", new { trangThai = "Hoàn thành" })" class="tab-btn @(ViewBag.TrangThai == "Hoàn thành" ? "active" : "")">Hoàn thành</a>
+        <a href="@Url.Action("Index", "DonHang", new { trangThai = "Đã hủy" })" class="tab-btn @(ViewBag.TrangThai == "Đã hủy" ? "active" : "")">Đã hủy</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Mã đơn</th>
+                <th>Khách nhận hàng</th>
+                <th>Sản phẩm</th>
+                <th>Tổng tiền</th>
+                <th>Thanh toán</th>
+                <th>Trạng thái</th>
+                <th>Chuyển trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var o in Model)
+            {
+                <tr>
+                    <td><strong>#@o.OrderID</strong></td>
+                    <td>
+                        <strong>@o.ReceiverName</strong><br />
+                        SĐT: @o.ReceiverPhone<br />
+                        Đ/c: @o.AddressDelivery
+                    </td>
+                    <td>
+                        @foreach (var d in o.OrderDetails)
+                        {
+                            <div>• @d.ProductName x @d.Quantity</div>
+                        }
+                    </td>
+                    <td style="font-weight:700; color:#d00;">@o.TotalAmount.ToString("N0")đ</td>
+                    <td>@o.PaymentStatus</td>
+                    <td><span class="badge">@o.OrderStatus</span></td>
+                    <td>
+                        @if (o.OrderStatus == "Chờ xác nhận")
+                        {
+                            <form method="post" action="@Url.Action("DoiTrangThai", "DonHang")" style="display:inline;">
+                                <input type="hidden" name="id" value="@o.OrderID" />
+                                <input type="hidden" name="trangThaiMoi" value="Đã xác nhận" />
+                                <button type="submit" class="btn-next">Duyệt đơn</button>
+                            </form>
+                        }
+                        else if (o.OrderStatus == "Đã xác nhận")
+                        {
+                            <form method="post" action="@Url.Action("DoiTrangThai", "DonHang")" style="display:inline;">
+                                <input type="hidden" name="id" value="@o.OrderID" />
+                                <input type="hidden" name="trangThaiMoi" value="Đang giao" />
+                                <button type="submit" class="btn-next">Giao hàng</button>
+                            </form>
+                        }
+                        else if (o.OrderStatus == "Đang giao")
+                        {
+                            <form method="post" action="@Url.Action("DoiTrangThai", "DonHang")" style="display:inline;">
+                                <input type="hidden" name="id" value="@o.OrderID" />
+                                <input type="hidden" name="trangThaiMoi" value="Hoàn thành" />
+                                <button type="submit" class="btn-next" style="background:#1a7f37;">Hoàn thành</button>
+                            </form>
+                        }
+
+                        @if (o.OrderStatus != "Hoàn thành" && o.OrderStatus != "Đã hủy")
+                        {
+                            <form method="post" action="@Url.Action("DoiTrangThai", "DonHang")" style="display:inline;" onsubmit="return confirm('Hủy đơn này sẽ hoàn lại tồn kho?');">
+                                <input type="hidden" name="id" value="@o.OrderID" />
+                                <input type="hidden" name="trangThaiMoi" value="Đã hủy" />
+                                <button type="submit" class="btn-cancel">Hủy</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

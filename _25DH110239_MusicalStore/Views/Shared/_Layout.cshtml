@@ -1,0 +1,266 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - MUSICAL STORE</title>
+    <!-- Nạp font Inter chuẩn phong cách tối giản giống bài mẫu -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset CSS và thiết lập tông màu chủ đạo Trắng - Đen */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #fff;
+            color: #111;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Thanh thông báo freeship trên cùng */
+        .topbar {
+            background: #111;
+            color: #fff;
+            text-align: center;
+            padding: 8px;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Thanh Header dính trên cùng khi cuộn trang */
+        header {
+            border-bottom: 1px solid #e5e5e5;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        /* Menu các hãng nhạc cụ nằm ngang */
+        .nav-menu {
+            display: flex;
+            gap: 22px;
+            list-style: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+            .nav-menu a:hover {
+                text-decoration: underline;
+            }
+
+        /* Cụm tìm kiếm, tài khoản và giỏ hàng bên phải */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 13px;
+        }
+
+        .search-form {
+            display: flex;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+            .search-form input {
+                border: none;
+                padding: 6px 10px;
+                outline: none;
+                font-size: 13px;
+                width: 150px;
+            }
+
+            .search-form button {
+                background: #111;
+                color: #fff;
+                border: none;
+                padding: 6px 12px;
+                cursor: pointer;
+                font-size: 13px;
+            }
+
+        .cart-badge {
+            background: #111;
+            color: #fff;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 3px;
+        }
+
+        /* Khung chứa nội dung chính của từng trang View */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Chân trang Footer nền đen chữ trắng */
+        footer {
+            background: #111;
+            color: #ccc;
+            padding: 40px 20px 20px;
+            margin-top: 60px;
+            font-size: 13px;
+        }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+            .footer-grid h4 {
+                color: #fff;
+                margin-bottom: 12px;
+                font-size: 14px;
+            }
+
+            .footer-grid p, .footer-grid li {
+                margin-bottom: 8px;
+                list-style: none;
+            }
+
+        .copyright {
+            text-align: center;
+            border-top: 1px solid #333;
+            margin-top: 30px;
+            padding-top: 15px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Thanh thông báo miễn phí vận chuyển -->
+    <div class="topbar">Miễn phí giao hàng toàn quốc cho đơn từ 1.000.000đ</div>
+
+    <header>
+        <div class="nav-container">
+            <!-- Logo dẫn về trang chủ -->
+            <a href="@Url.Action("Index", "Home")" class="logo">MUSICAL STORE</a>
+
+            <!-- Menu 5 hãng nhạc cụ tương ứng CategoryID 1 -> 5 -->
+            <ul class="nav-menu">
+                <li><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                <li><a href="@Url.Action("DanhMuc", "Home", new { id = 1 })">Yamaha</a></li>
+                <li><a href="@Url.Action("DanhMuc", "Home", new { id = 2 })">Fender</a></li>
+                <li><a href="@Url.Action("DanhMuc", "Home", new { id = 3 })">Roland</a></li>
+                <li><a href="@Url.Action("DanhMuc", "Home", new { id = 4 })">Casio</a></li>
+                <li><a href="@Url.Action("DanhMuc", "Home", new { id = 5 })">Gibson</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <!-- Form tìm kiếm gửi từ khóa keyword lên HomeController/TimKiem -->
+                <form action="@Url.Action("TimKiem", "Home")" method="get" class="search-form">
+                    <input type="text" name="keyword" placeholder="Tìm nhạc cụ..." value="@Request.QueryString["keyword"]" />
+                    <button type="submit">Tìm</button>
+                </form>
+
+                <!-- Kiểm tra Session đăng nhập để đổi nút hiển thị -->
+                @if (Session["Username"] != null)
+                {
+                    if (Session["UserRole"] != null && Session["UserRole"].ToString() == "Admin")
+                    {
+                        <a href="@Url.Action("Index", "HangHoa")" style="font-weight:700; color:#d00;">[Quản trị]</a>
+                    }
+                    <a href="@Url.Action("LichSuMuaHang", "Home")" style="font-weight:600;">Đơn hàng (@Session["FullName"])</a>
+                    <a href="@Url.Action("DangXuat", "Home")">Thoát</a>
+                }
+                else
+                {
+                    <a href="@Url.Action("DangNhap", "Home")">Đăng nhập</a>
+                    <a href="@Url.Action("DangKy", "Home")">Đăng ký</a>
+                }
+
+                <!-- Nút vào giỏ hàng kèm bộ đếm số lượng từ localStorage -->
+                <a href="@Url.Action("GioHang", "Home")">
+                    Giỏ hàng <span class="cart-badge" id="header-cart-count">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Khu vực render nội dung của các trang View con -->
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- Chân trang -->
+    <footer>
+        <div class="footer-grid">
+            <div>
+                <h4>VỀ MUSICAL STORE</h4>
+                <p>Hệ thống phân phối nhạc cụ chính hãng uy tín hàng đầu.</p>
+                <p>Địa chỉ: Quận 5, TP. Hồ Chí Minh</p>
+                <p>Hotline: 0901 234 567</p>
+            </div>
+            <div>
+                <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+                <ul>
+                    <li>Hướng dẫn mua hàng</li>
+                    <li>Chính sách bảo hành đàn</li>
+                    <li>Chính sách đổi trả</li>
+                    <li>Phương thức thanh toán</li>
+                </ul>
+            </div>
+            <div>
+                <h4>CHÍNH SÁCH</h4>
+                <ul>
+                    <li>Chính sách vận chuyển</li>
+                    <li>Chính sách kiểm hàng</li>
+                    <li>Bảo mật thông tin</li>
+                </ul>
+            </div>
+            <div>
+                <h4>KẾT NỐI VỚI CHÚNG TÔI</h4>
+                <p>Facebook | YouTube | TikTok</p>
+            </div>
+        </div>
+        <div class="copyright">© 2026 Musical Store - Nhóm 0202-G17. All rights reserved.</div>
+    </footer>
+
+    <!-- Script đếm tổng số lượng sản phẩm trong giỏ hàng lưu ở localStorage -->
+    <script>
+        function updateCartCount() {
+            var cart = JSON.parse(localStorage.getItem('musical_cart')) || [];
+            var total = cart.reduce(function (sum, item) { return sum + item.quantity; }, 0);
+            var badge = document.getElementById('header-cart-count');
+            if (badge) badge.innerText = total;
+        }
+        updateCartCount();
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

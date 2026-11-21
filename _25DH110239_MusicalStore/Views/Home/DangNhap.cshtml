@@ -1,0 +1,129 @@
+﻿@{
+    ViewBag.Title = "Đăng nhập";
+}
+
+<style>
+    /* Bố cục khung đăng nhập 2 cột (Ảnh bên trái - Form bên phải) giống bài mẫu */
+    .auth-box {
+        max-width: 850px;
+        margin: 40px auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .auth-img {
+        background: url('https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=800&q=80') center no-repeat;
+        background-size: cover;
+        min-height: 380px;
+    }
+
+    .auth-form {
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+        .auth-form h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .auth-form p {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 24px;
+        }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+    .btn-black {
+        width: 100%;
+        background: #111;
+        color: #fff;
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 8px;
+    }
+
+        .btn-black:hover {
+            background: #333;
+        }
+
+    .alert-err {
+        background: #fee;
+        color: #c00;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+
+    .alert-ok {
+        background: #efe;
+        color: #070;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="auth-box">
+    <div class="auth-img"></div>
+    <div class="auth-form">
+        <h2>Đăng nhập</h2>
+        <p>Chào mừng trở lại với Musical Store</p>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert-err">@ViewBag.Error</div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert-ok">@TempData["Success"]</div>
+        }
+
+        <!-- Form gửi username và password về Action DangNhap [HttpPost] -->
+        <form method="post" action="@Url.Action("DangNhap", "Home")">
+            <div class="form-group">
+                <label>Tên đăng nhập</label>
+                <input type="text" name="username" required placeholder="Nhập tên đăng nhập (vd: trung25dh hoặc admin)" />
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" name="password" required placeholder="Nhập mật khẩu (vd: 123456)" />
+            </div>
+            <button type="submit" class="btn-black">Đăng nhập</button>
+        </form>
+
+        <p style="margin-top: 20px; text-align: center;">
+            Chưa có tài khoản? <a href="@Url.Action("DangKy", "Home")" style="font-weight: 700; text-decoration: underline;">Đăng ký ngay</a>
+        </p>
+    </div>
+</div>
